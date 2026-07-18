@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('processed_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'diterima', 'dibatalkan'])->default('pending');
             $table->decimal('total_amount', 10, 2)->default(0);
             $table->text('notes')->nullable();
             $table->dateTime('order_date');
