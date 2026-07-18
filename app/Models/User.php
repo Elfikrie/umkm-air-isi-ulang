@@ -56,4 +56,14 @@ class User extends Authenticatable implements FilamentUser
     {
         return in_array($this->role, ['admin', 'kasir']);
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    public function processedOrders()
+    {
+        return $this->hasMany(Order::class, 'processed_by');
+    }
 }
