@@ -40,32 +40,26 @@ class OrderResource extends Resource
                     ])
                     ->default('pending')
                     ->required(),
-                Forms\Components\Select::make('product_id')
-                    ->relationship('items', 'product_id')
-                    ->multiple()
-                    ->preload()
-                    ->label('Produk')
-                    ->required(),
-                Forms\Components\TextInput::make('total_amount')
-                        ->required()
-                        ->numeric()
-                        ->prefix('Rp')
-                        ->default(0.00)
-                        ->disabled()
-                        ->dehydrated(false)
-                        ->label('Total Otomatis'),
-                Forms\Components\Textarea::make('notes')
-                    ->columnSpanFull()
-                    ->label('Catatan'),
                 Forms\Components\DateTimePicker::make('order_date')
                     ->required()
                     ->default(now()),
+                Forms\Components\Select::make('processed_by')
+                    ->relationship('processor', 'name', function (Builder $query) {
+                        return $query->where('role', 'kasir');
+                    })
+                    ->label('Diproses Oleh')
+                    ->default(auth()->user()?->id),
+                    // ->disabled(),
+                Forms\Components\Textarea::make('notes')
+                    ->columnSpanFull()
+                    ->label('Catatan'),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->withSum('items', 'subtotal'))
             ->columns([
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Pelanggan')
@@ -73,7 +67,9 @@ class OrderResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('processor.name')
                     ->label('Diproses Oleh')
-                    ->default('-'),
+                    ->default('kasir')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->sortable()
                     ->badge()
@@ -82,13 +78,11 @@ class OrderResource extends Resource
                         'diterima' => 'success',
                         'dibatalkan' => 'danger',
                     }),
-                Tables\Columns\TextColumn::make('total_amount')
+                Tables\Columns\TextColumn::make('items_sum_subtotal')
+                    ->label('Total')
                     ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('order_date')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('processed_at')
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
