@@ -25,7 +25,10 @@ class OrderItemResource extends Resource
             ->schema([
                 Forms\Components\Select::make('order_id')
                     ->relationship('order', 'id')
-                    ->required(),
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "Order #{$record->id} - {$record->customer->name} - {$record->order_date->format('d M Y')}")
+                    ->required()
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'name')
                     ->required()
@@ -33,38 +36,31 @@ class OrderItemResource extends Resource
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                         $product = \App\Models\Product::find($state);
                         if ($product) {
-                            $set('price_at_order', $product->price??0);
+                            $set('price_at_order', $product->price);
 
-                            $qty = (float) ($get('quantity') ?? 0);
-                            $subtotal = $qty * ($product->price ?? 0);
-                            $set('subtotal', $subtotal);
+                            $qty = $get('quantity') ?? 0;
+
+                            $set('subtotal', $product->price * $qty);
                         }
                     }),
                 Forms\Components\TextInput::make('quantity')
                     ->required()
-                    ->live()
                     ->numeric()
+                    ->minValue(1)
+                    ->live()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                        $price = (float) ($get('price_at_order') ?? 0);
-                        $subtotal = $state * $price;
-                        $set('subtotal', $subtotal);
+                        $price = $get('price_at_order')?? 0;
+                        $set('subtotal', $price * $state);
                     }),
                 Forms\Components\TextInput::make('price_at_order')
-                    ->required()
                     ->label('Harga')
-                    ->live()
-                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                        $qty = (float) ($get('quantity') ?? 0);
-                        $subtotal = $qty * $state;
-                        $set('subtotal', $subtotal);
-                    })
+                    ->disabled()
+                    ->dehydrated(false)
                     ->numeric(),
                 Forms\Components\TextInput::make('subtotal')
                     ->label('Subtotal')
-                    ->required()
-                    ->live()
                     ->disabled()
-                    ->dehydrated()
+                    ->dehydrated(false)
                     ->numeric(),
             ]);
     }
@@ -74,7 +70,9 @@ class OrderItemResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('order_id')
+                    ->getStateUsing(fn ($record) => "Order #{$record->order->id} - {$record->order->customer->name} - {$record->order->order_date->format('d M Y')}")
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('product.name')
                     ->label('Produk')
@@ -129,5 +127,20 @@ class OrderItemResource extends Resource
     public static function canViewAny(): bool
     {
         return in_array(auth()->user()->role, ['admin', 'kasir']);
+    }
+
+    public static function canCreate(): bool
+    {
+        return in_array(auth()->user()->role, ['admin', 'kasir']);
+    }
+
+    public static function canEdit($record): bool
+    {
+        return in_array(auth()->user()->role, ['admin', 'kasir']);
+    }
+
+    public static function canDelete($record): bool
+    {
+        return in_array(auth()->user()->role, ['admin']);
     }
 }

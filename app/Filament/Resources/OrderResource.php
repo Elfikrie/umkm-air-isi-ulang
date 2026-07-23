@@ -61,6 +61,9 @@ class OrderResource extends Resource
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->withSum('items', 'subtotal'))
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Pelanggan')
                     ->searchable()
@@ -79,7 +82,7 @@ class OrderResource extends Resource
                         'dibatalkan' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('items_sum_subtotal')
-                    ->label('Total')
+                    ->label('Total_amount')
                     ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('order_date')

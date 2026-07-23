@@ -15,6 +15,10 @@ class Order extends Model
         'status',
     ];
 
+    protected $casts = [
+        'order_date' => 'datetime',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');

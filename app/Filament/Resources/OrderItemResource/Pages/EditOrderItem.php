@@ -16,4 +16,11 @@ class EditOrderItem extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        $orderId = $this->record->order_id;
+
+        return $this->getResource()::getUrl('index', ['order_id' => $orderId]);
+    }
 }
