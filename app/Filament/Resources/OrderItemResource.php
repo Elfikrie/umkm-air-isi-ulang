@@ -38,7 +38,7 @@ class OrderItemResource extends Resource
                         if ($product) {
                             $set('price_at_order', $product->price);
 
-                            $qty = $get('quantity') ?? 0;
+                            $qty = (float) $get('quantity') ?? 0;
 
                             $set('subtotal', $product->price * $qty);
                         }
@@ -47,9 +47,10 @@ class OrderItemResource extends Resource
                     ->required()
                     ->numeric()
                     ->minValue(1)
+                    ->default(1)
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                        $price = $get('price_at_order')?? 0;
+                        $price = (float) $get('price_at_order') ?? 0;
                         $set('subtotal', $price * $state);
                     }),
                 Forms\Components\TextInput::make('price_at_order')

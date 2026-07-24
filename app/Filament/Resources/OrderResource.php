@@ -14,6 +14,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\Repeater;
 
 class OrderResource extends Resource
 {
@@ -53,6 +54,48 @@ class OrderResource extends Resource
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull()
                     ->label('Catatan'),
+                Repeater::make('items')
+                    ->relationship()
+                    ->label('Item Pesanan')
+                    ->addActionLabel('Tambah Item')
+                    ->schema([
+                        Forms\Components\TextInput::make('quantity')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1)
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $price = (float) $get('price_at_order') ?? 0;
+                                $set('subtotal', $price * $state);
+                            }),
+                        Forms\Components\Select::make('product_id')
+                            ->relationship('product', 'name')
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $product = \App\Models\Product::find($state);
+                                if ($product) {
+                                    $set('price_at_order', $product->price);
+                                    $qty = (float) $get('quantity') ?? 1;
+                                    $set('subtotal', $product->price * $qty);
+                                }
+                            }),
+                        Forms\Components\TextInput::make('price_at_order')
+                            ->required()
+                            ->numeric()
+                            ->live()
+                            ->disabled(),
+                        Forms\Components\TextInput::make('subtotal')
+                            ->required()
+                            ->numeric('float')
+                            ->live()
+                            ->disabled()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $quantity = $get('quantity') ?? 1;
+                                $price = $get('price_at_order') ?? 0;
+                                $set('subtotal', $price * $quantity);
+                            }),
+                    ])
             ]);
     }
 
@@ -71,6 +114,10 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('processor.name')
                     ->label('Diproses Oleh')
                     ->default('kasir')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('items.product.name')
+                    ->label('Produk')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
