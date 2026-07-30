@@ -12,7 +12,7 @@ class OrderStats extends BaseWidget
     {
         $jam = now()->hour;
         $sapaan = match (true) {
-            $jam < 11 => 'Selamat Pagi',
+            $jam < 11 => 'Selamat Pagi',    
             $jam < 15 => 'Selamat Siang',
             $jam < 18 => 'Selamat Sore',
             default   => 'Selamat Malam',
@@ -21,9 +21,7 @@ class OrderStats extends BaseWidget
 
         $pendapatanBulanIni = Order::whereMonth('order_date', now()->month)
             ->where('status', 'diterima')
-            ->withSum('items', 'subtotal')
-            ->get()
-            ->sum('items_sum_subtotal');
+            ->sum('total_amount');
 
         return [
             Stat::make("{$sapaan}, {$nama} 👋", 'Selamat datang di Dashboard Air Isi Ulang')

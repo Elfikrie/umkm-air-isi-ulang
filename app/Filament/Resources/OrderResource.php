@@ -32,14 +32,14 @@ class OrderResource extends Resource
                     ->searchable()
                     ->label('Pelanggan'),
 
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'diterima' => 'Diterima',
-                        'dibatalkan' => 'Dibatalkan',
-                    ])
-                    ->default('pending')
-                    ->required(),
+                // Forms\Components\Select::make('status')
+                //     ->options([
+                //         'pending' => 'Pending',
+                //         'diterima' => 'Diterima',
+                //         'dibatalkan' => 'Dibatalkan',
+                //     ])
+                //     ->default('pending')
+                //     ->required(),
 
                 Forms\Components\DateTimePicker::make('order_date')
                     ->required()
@@ -111,6 +111,10 @@ class OrderResource extends Resource
                     ->label('Diproses Oleh')
                     ->default('-'),
 
+                Tables\Columns\TextColumn::make('items')
+                    ->getStateUsing(fn ($record) => $record->items->map(fn ($item) => $item->product->name)->join(', '))
+                    ->label('produk'),
+
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -143,6 +147,7 @@ class OrderResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
@@ -151,6 +156,7 @@ class OrderResource extends Resource
                         'dibatalkan' => 'Dibatalkan',
                     ]),
             ])
+
             ->actions([
                 Tables\Actions\Action::make('accept')
                     ->label('Terima')

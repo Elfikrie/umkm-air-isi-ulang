@@ -11,7 +11,10 @@ class OrderItemObserver
      */
     public function saving(OrderItem $orderItem): void
     {
-        $orderItem->price_at_order = $orderItem->product->price;
+        if (! $orderItem->exists) {
+            $orderItem->price_at_order = $orderItem->product->price;
+        }
+
         $orderItem->subtotal = $orderItem->quantity * $orderItem->price_at_order;
     }
 
