@@ -127,17 +127,17 @@ class OrderItemResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return in_array(auth()->user()->role, ['admin', 'kasir']);
+        return in_array(auth()->user()->role, ['admin']);
     }
 
     public static function canCreate(): bool
     {
-        return in_array(auth()->user()->role, ['admin', 'kasir']);
+        return in_array(auth()->user()->role, ['admin']);
     }
 
     public static function canEdit($record): bool
     {
-        return in_array(auth()->user()->role, ['admin', 'kasir']);
+        return in_array(auth()->user()->role, ['admin']);
     }
 
     public static function canDelete($record): bool

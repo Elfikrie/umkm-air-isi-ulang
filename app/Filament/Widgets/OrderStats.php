@@ -12,12 +12,16 @@ class OrderStats extends BaseWidget
     {
         $jam = now()->hour;
         $sapaan = match (true) {
-            $jam < 11 => 'Selamat Pagi',    
+            $jam < 11 => 'Selamat Pagi',
             $jam < 15 => 'Selamat Siang',
             $jam < 18 => 'Selamat Sore',
             default   => 'Selamat Malam',
         };
         $nama = auth()->user()->name ?? 'Admin';
+
+        $pendapatanHariIni = Order::whereDate('order_date', today())
+            ->where('status', 'diterima')
+            ->sum('total_amount');
 
         $pendapatanBulanIni = Order::whereMonth('order_date', now()->month)
             ->where('status', 'diterima')
@@ -33,6 +37,11 @@ class OrderStats extends BaseWidget
                 ->description('Jumlah pesanan masuk hari ini')
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
+
+            Stat::make('Pendapatan Hari Ini', 'Rp' . number_format($pendapatanHariIni, 0, ',', '.'))
+                ->description('Total Pendapatan Hari Ini (status diterima)')
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('success'),
 
             Stat::make('Pendapatan Bulan Ini', 'Rp ' . number_format($pendapatanBulanIni, 0, ',', '.'))
                 ->description('Total pendapatan bulan ini (status diterima)')
