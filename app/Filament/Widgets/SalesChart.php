@@ -7,6 +7,7 @@ use Filament\Widgets\ChartWidget;
 
 class SalesChart extends ChartWidget
 {
+    protected static ?int $sort = 5;
     protected static ?string $heading = 'Grafik Penjualan Air Isi Ulang (7 Hari Terakhir)';
 
     protected function getData(): array

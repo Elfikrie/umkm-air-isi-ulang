@@ -16,6 +16,8 @@ use Filament\Widgets;
 use App\Filament\Widgets\OrderStats;
 use App\Filament\Widgets\ProductChart;
 use App\Filament\Widgets\RevenueChart;
+use App\Filament\Widgets\SalesChart;
+use App\Filament\Widgets\WelcomeStats;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -149,12 +151,14 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                WelcomeStats::class,
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
                 OrderStats::class,
                 RevenueChart::class,
+                SalesChart::class,
                 ProductChart::class
             ])
             ->middleware([

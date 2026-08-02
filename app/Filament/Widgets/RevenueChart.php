@@ -8,6 +8,7 @@ use Carbon\Carbon;
 
 class RevenueChart extends ChartWidget
 {
+    protected static ?int $sort = 3;
     protected static ?string $heading = 'Tren Pendapatan (30 Hari Terakhir)';
 
     protected function getData(): array
