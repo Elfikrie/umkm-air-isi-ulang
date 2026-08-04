@@ -12,7 +12,7 @@ class WelcomeStats extends BaseWidget
         {
             return 1;
         }
-        
+
     protected function getStats(): array
     {
         $jam = now()->hour;
@@ -26,7 +26,7 @@ class WelcomeStats extends BaseWidget
 
         return [
             Stat::make("{$sapaan}, {$nama} 👋", 'Selamat datang di Dashboard Air Isi Ulang')
-                ->description('Semoga usahamu lancar hari ini!')
+                ->description('Semoga usahamu lancar hari ini! Tetap semangat dan terus berkembang selalu dan jangan lupa untuk selalu menjaga kualitas produk dan pelayananmu agar pelanggan tetap puas dan loyal. Semoga hari ini menjadi hari yang produktif dan menyenangkan bagi bisnismu!')
                 ->descriptionIcon('heroicon-m-sparkles')
                 ->color('primary'),
         ];
