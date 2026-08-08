@@ -18,6 +18,15 @@ new #[Layout('layouts.guest')] class extends Component
 
         $this->form->authenticate();
 
+        if(Auth::user()->role !== 'pelanggan'){
+            Auth::logout();
+            Session::invalidate();
+            Session::regenerateToken();
+
+            $this->addError('form.email', 'Kamu tidak punya akses ke halaman ini. Silakan login dengan akun pelanggan');
+            return;
+        }
+
         Session::regenerate();
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
